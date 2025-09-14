@@ -1,0 +1,15 @@
+echo __pycache__/>>.gitignore
+echo *.pyc>>.gitignore
+echo *.pyo>>.gitignore
+echo venv/>>.gitignore
+echo .venv/>>.gitignore
+echo env/>>.gitignore
+echo *.log>>.gitignore
+echo *.tmp>>.gitignore
+echo uploads/>>.gitignore
+echo outputs/>>.gitignore
+echo *.onnx>>.gitignore
+echo *.pt>>.gitignore
+echo *.pth>>.gitignore
+echo *.h5>>.gitignore
+echo *.ckpt>>.gitignore
