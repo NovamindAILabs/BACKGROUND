@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Background Remover</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      background: linear-gradient(135deg, #0b0f14, #121823);
+      color: #f5f7fa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      max-width: 960px;
+      width: 100%;
+      padding: 32px;
+    }
+    .card {
+      background: #1a2232;
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    p.subtitle {
+      margin: 0 0 28px;
+      text-align: center;
+      font-size: 0.95rem;
+      opacity: 0.8;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    input[type=file] {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #2a3a54;
+      background: #0f141d;
+      color: #bcd;
+      cursor: pointer;
+    }
+    button {
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      background: #2e7dff;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #1a5ed8;
+    }
+    .status {
+      margin-top: 6px;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+    .preview-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .box {
+      background: #0f141d;
+      border: 1px dashed #2a3a54;
+      border-radius: 12px;
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .box img {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 10px;
+    }
+    .download {
+      margin-top: 24px;
+      text-align: center;
+    }
+    .download a button {
+      background: #28c76f;
+    }
+    .download a button:hover {
+      background: #20a35a;
+    }
+    @media (max-width: 768px) {
+      .preview-area {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>AI Background Remover</h1>
+      <p class="subtitle">Upload an image and instantly get a transparent background.</p>
+
+      <div class="actions">
+        <input id="file" type="file" accept="image/*">
+        <button id="run">Remove Background</button>
+      </div>
+      <div class="status" id="status"></div>
+
+      <div class="preview-area">
+        <div class="box"><img id="preview" alt="Input preview"></div>
+        <div class="box"><img id="result" alt="Output preview"></div>
+      </div>
+
+      <div class="download" id="downloadWrap" style="display:none">
+        <a id="download" download="output.png"><button>Download PNG</button></a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    const runBtn = document.getElementById('run');
+    const preview = document.getElementById('preview');
+    const resultImg = document.getElementById('result');
+    const status = document.getElementById('status');
+    const dlWrap = document.getElementById('downloadWrap');
+    const dlLink = document.getElementById('download');
+
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files[0];
+      if (!f) return;
+      preview.src = URL.createObjectURL(f);
+      resultImg.removeAttribute('src');
+      dlWrap.style.display = 'none';
+      status.textContent = '';
+    });
+
+    runBtn.addEventListener('click', async () => {
+      const f = fileInput.files[0];
+      if (!f) { status.textContent = 'Select a file first.'; return; }
+      status.textContent = 'Processing...';
+
+      const fd = new FormData();
+      fd.append('file', f);
+      try {
+        const r = await fetch('/remove', { method: 'POST', body: fd });
+        const j = await r.json();
+        if (!r.ok) throw new Error(j.error || 'Failed');
+        resultImg.src = j.output + '?t=' + Date.now();
+        dlLink.href = j.output;
+        dlWrap.style.display = 'block';
+        status.textContent = 'Done.';
+      } catch (e) {
+        status.textContent = e.message;
+      }
+    });
+  </script>
+</body>
+</html>
