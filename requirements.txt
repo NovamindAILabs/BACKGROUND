@@ -8,7 +8,7 @@ Werkzeug==3.0.3
 gunicorn==22.0.0
 
 # Core image BG removal
-rembg==2.0.61
+rembg==2.0.67
 numpy==1.23.5
 Pillow==10.4.0
 onnxruntime==1.19.2
